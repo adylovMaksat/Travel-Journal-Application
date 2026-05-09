@@ -1,9 +1,9 @@
 import { Text, View } from 'react-native';
 
-export default function AddEntryScreen() {
+export default function DetailsScreen() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Add Entry Screen</Text>
+      <Text>Details Screen</Text>
     </View>
   );
 }
