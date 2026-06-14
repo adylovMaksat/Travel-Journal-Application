@@ -1,14 +1,44 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Image,
   ScrollView,
+  Button,
+  Alert,
 } from "react-native";
 
-export default function DetailsScreen({ route }: any) {
+import { JournalContext } from "../context/JournalContext";
+
+export default function DetailsScreen({
+  route,
+  navigation,
+}: any) {
   const { entry } = route.params;
+
+  const { deleteEntry } = useContext(JournalContext);
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Entry",
+      "Are you sure you want to delete this journal entry?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteEntry(entry.id);
+            navigation.goBack();
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -20,7 +50,9 @@ export default function DetailsScreen({ route }: any) {
       ) : null}
 
       <View style={styles.content}>
-        <Text style={styles.title}>{entry.title}</Text>
+        <Text style={styles.title}>
+          {entry.title}
+        </Text>
 
         {entry.location ? (
           <Text style={styles.location}>
@@ -28,13 +60,21 @@ export default function DetailsScreen({ route }: any) {
           </Text>
         ) : null}
 
-        <Text style={styles.sectionTitle}>
+        <Text style={styles.section}>
           Notes
         </Text>
 
         <Text style={styles.notes}>
           {entry.notes || "No notes available."}
         </Text>
+
+        <View style={{ marginTop: 30 }}>
+          <Button
+            title="Delete Entry"
+            color="red"
+            onPress={handleDelete}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -67,7 +107,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
-  sectionTitle: {
+  section: {
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 10,
