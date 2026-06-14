@@ -3,8 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   FlatList,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 
 import { JournalContext } from "../context/JournalContext";
@@ -14,10 +15,10 @@ export default function HomeScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Travel Journal</Text>
+      <Text style={styles.header}>Travel Journal</Text>
 
       {entries.length === 0 ? (
-        <Text style={styles.emptyText}>
+        <Text style={styles.empty}>
           No journal entries yet.
         </Text>
       ) : (
@@ -25,17 +26,43 @@ export default function HomeScreen({ navigation }: any) {
           data={entries}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <Text style={styles.entry}>
-              • {item.title}
-            </Text>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate("Details", {
+                  entry: item,
+                })
+              }
+            >
+              {item.image && (
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.image}
+                />
+              )}
+
+              <Text style={styles.title}>
+                {item.title}
+              </Text>
+
+              {item.location ? (
+                <Text style={styles.location}>
+                  📍 {item.location}
+                </Text>
+              ) : null}
+
+              {item.notes ? (
+                <Text
+                  numberOfLines={2}
+                  style={styles.notes}
+                >
+                  {item.notes}
+                </Text>
+              ) : null}
+            </TouchableOpacity>
           )}
         />
       )}
-
-      <Button
-        title="View Sample Entry"
-        onPress={() => navigation.navigate("Details")}
-      />
     </View>
   );
 }
@@ -43,20 +70,54 @@ export default function HomeScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: "#f5f5f5",
+    padding: 15,
   },
-  title: {
-    fontSize: 28,
+
+  header: {
+    fontSize: 30,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
   },
-  emptyText: {
+
+  empty: {
     textAlign: "center",
-    marginBottom: 20,
-  },
-  entry: {
+    marginTop: 50,
     fontSize: 18,
-    paddingVertical: 8,
+    color: "gray",
+  },
+
+  card: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: "hidden",
+    elevation: 3,
+  },
+
+  image: {
+    width: "100%",
+    height: 200,
+  },
+
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    paddingHorizontal: 15,
+    paddingTop: 10,
+  },
+
+  location: {
+    fontSize: 16,
+    color: "#555",
+    paddingHorizontal: 15,
+    marginTop: 5,
+  },
+
+  notes: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    color: "#666",
   },
 });
