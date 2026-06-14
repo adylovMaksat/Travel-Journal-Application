@@ -6,7 +6,10 @@ import {
   Button,
   StyleSheet,
   Keyboard,
+  Image,
 } from "react-native";
+
+import * as ImagePicker from "expo-image-picker";
 
 import { JournalContext } from "../context/JournalContext";
 
@@ -15,25 +18,44 @@ export default function AddEntryScreen({ navigation }: any) {
 
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
+  const [image, setImage] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    const permission =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      alert("Gallery permission is required.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   const handleSave = () => {
     if (!title.trim()) return;
 
-    // Close the keyboard
     Keyboard.dismiss();
 
-    // Save the new entry
     addEntry({
       id: Date.now().toString(),
       title,
       notes,
+      image,
     });
 
-    // Clear the form
     setTitle("");
     setNotes("");
+    setImage(null);
 
-    // Go back to Home screen
     navigation.navigate("Home");
   };
 
@@ -56,7 +78,14 @@ export default function AddEntryScreen({ navigation }: any) {
         style={[styles.input, styles.notes]}
       />
 
-      <Button title="Add Photo" onPress={() => {}} />
+      <Button title="Add Photo" onPress={pickImage} />
+
+      {image && (
+        <Image
+          source={{ uri: image }}
+          style={styles.preview}
+        />
+      )}
 
       <View style={styles.spacing} />
 
@@ -74,11 +103,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+
   heading: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
   },
+
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -86,11 +117,21 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 6,
   },
+
   notes: {
     height: 120,
     textAlignVertical: "top",
   },
+
   spacing: {
     height: 10,
+  },
+
+  preview: {
+    width: "100%",
+    height: 200,
+    marginTop: 15,
+    marginBottom: 15,
+    borderRadius: 10,
   },
 });
