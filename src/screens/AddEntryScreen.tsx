@@ -3,14 +3,18 @@ import {
   View,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
   StyleSheet,
   Keyboard,
   Image,
+  Platform,
+  ScrollView,
 } from "react-native";
 
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
+
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { JournalContext } from "../context/JournalContext";
 
@@ -22,7 +26,9 @@ export default function AddEntryScreen({ navigation }: any) {
   const [image, setImage] = useState<string | null>(null);
   const [location, setLocation] = useState("");
 
-  // Pick image from gallery
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const pickImage = async () => {
     const permission =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -32,19 +38,20 @@ export default function AddEntryScreen({ navigation }: any) {
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      quality: 1,
-    });
+    const result =
+      await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        quality: 1,
+      });
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
 
-  // Get current location and convert it to a readable place
   const getCurrentLocation = async () => {
-    const permission = await Location.requestForegroundPermissionsAsync();
+    const permission =
+      await Location.requestForegroundPermissionsAsync();
 
     if (permission.status !== "granted") {
       alert("Location permission denied.");
@@ -52,12 +59,14 @@ export default function AddEntryScreen({ navigation }: any) {
     }
 
     try {
-      const current = await Location.getCurrentPositionAsync({});
+      const current =
+        await Location.getCurrentPositionAsync({});
 
-      const places = await Location.reverseGeocodeAsync({
-        latitude: current.coords.latitude,
-        longitude: current.coords.longitude,
-      });
+      const places =
+        await Location.reverseGeocodeAsync({
+          latitude: current.coords.latitude,
+          longitude: current.coords.longitude,
+        });
 
       if (places.length > 0) {
         const place = places[0];
@@ -78,30 +87,18 @@ export default function AddEntryScreen({ navigation }: any) {
           locationParts.push(place.country);
         }
 
-        if (locationParts.length > 0) {
-          setLocation(locationParts.join(", "));
-        } else {
-          setLocation(
-            `${current.coords.latitude.toFixed(
-              5
-            )}, ${current.coords.longitude.toFixed(5)}`
-          );
-        }
-      } else {
-        setLocation(
-          `${current.coords.latitude.toFixed(
-            5
-          )}, ${current.coords.longitude.toFixed(5)}`
-        );
+        setLocation(locationParts.join(", "));
       }
-    } catch (error) {
+    } catch {
       alert("Unable to retrieve current location.");
     }
   };
 
-  // Save entry
   const handleSave = () => {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      alert("Please enter a trip title.");
+      return;
+    }
 
     Keyboard.dismiss();
 
@@ -111,19 +108,27 @@ export default function AddEntryScreen({ navigation }: any) {
       notes,
       image,
       location,
+      date: date.toLocaleDateString(),
     });
 
     setTitle("");
     setNotes("");
     setImage(null);
     setLocation("");
+    setDate(new Date());
 
     navigation.navigate("Home");
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Add New Entry</Text>
+    <ScrollView
+  style={styles.container}
+  contentContainerStyle={styles.content}
+  showsVerticalScrollIndicator={false}
+>
+      <Text style={styles.heading}>
+        Add New Entry
+      </Text>
 
       <TextInput
         placeholder="Trip Title"
@@ -139,12 +144,42 @@ export default function AddEntryScreen({ navigation }: any) {
         style={styles.input}
       />
 
-      <Button
-        title="Use Current GPS Location"
+      <TouchableOpacity
+        style={styles.locationButton}
         onPress={getCurrentLocation}
-      />
+      >
+        <Text style={styles.buttonText}>
+          Use Current GPS Location
+        </Text>
+      </TouchableOpacity>
 
-      <View style={styles.spacing} />
+      <TouchableOpacity
+        style={styles.dateButton}
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text style={styles.buttonText}>
+          📅 {date.toLocaleDateString()}
+        </Text>
+      </TouchableOpacity>
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display={
+            Platform.OS === "ios"
+              ? "spinner"
+              : "default"
+          }
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(false);
+
+            if (selectedDate) {
+              setDate(selectedDate);
+            }
+          }}
+        />
+      )}
 
       <TextInput
         placeholder="Notes"
@@ -154,10 +189,14 @@ export default function AddEntryScreen({ navigation }: any) {
         style={[styles.input, styles.notes]}
       />
 
-      <Button
-        title="Add Photo"
+      <TouchableOpacity
+        style={styles.photoButton}
         onPress={pickImage}
-      />
+      >
+        <Text style={styles.buttonText}>
+          Add Photo
+        </Text>
+      </TouchableOpacity>
 
       {image && (
         <Image
@@ -166,34 +205,43 @@ export default function AddEntryScreen({ navigation }: any) {
         />
       )}
 
-      <View style={styles.spacing} />
-
-      <Button
-        title="Save Entry"
+      <TouchableOpacity
+        style={styles.saveButton}
         onPress={handleSave}
-      />
-    </View>
+      >
+        <Text style={styles.saveText}>
+          Save Entry
+        </Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: "#f5f5f5",
+    paddingHorizontal: 20,
   },
 
   heading: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
+    fontSize: 28,
+    marginTop: 10,
+    marginBottom: 15,
+    fontFamily: "Montserrat_700Bold",
+  },
+
+  content: {
+    paddingTop: 70,
+    paddingBottom: 50,
   },
 
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 15,
     marginBottom: 15,
-    borderRadius: 6,
+    fontFamily: "Montserrat_400Regular",
   },
 
   notes: {
@@ -201,15 +249,52 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
 
-  spacing: {
-    height: 10,
+  locationButton: {
+    backgroundColor: "#2563eb",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 15,
+    alignItems: "center",
+  },
+
+  dateButton: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 15,
+    alignItems: "center",
+  },
+
+  photoButton: {
+    backgroundColor: "#10b981",
+    padding: 15,
+    borderRadius: 15,
+    alignItems: "center",
+    marginBottom: 15,
+  },
+
+  buttonText: {
+    color: "#000",
+    fontFamily: "Montserrat_700Bold",
   },
 
   preview: {
     width: "100%",
-    height: 200,
-    marginTop: 15,
+    height: 220,
+    borderRadius: 15,
     marginBottom: 15,
-    borderRadius: 10,
+  },
+
+  saveButton: {
+    backgroundColor: "#111827",
+    padding: 18,
+    borderRadius: 15,
+    alignItems: "center",
+  },
+
+  saveText: {
+    color: "#fff",
+    fontSize: 18,
+    fontFamily: "Montserrat_700Bold",
   },
 });

@@ -5,6 +5,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import {
+  useFonts,
+  Montserrat_700Bold,
+  Montserrat_400Regular,
+} from "@expo-google-fonts/montserrat";
+
 import { JournalProvider } from "./src/context/JournalContext";
 
 import HomeScreen from "./src/screens/HomeScreen";
@@ -21,6 +27,17 @@ function BottomTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        tabBarStyle: {
+          height: 75,
+          paddingTop: 10,
+          paddingBottom: 10,
+        },
+
+        tabBarLabelStyle: {
+          fontFamily: "Montserrat_700Bold",
+          fontSize: 12,
+          marginBottom: 2,
+        },
       }}
     >
       <Tab.Screen
@@ -47,6 +64,15 @@ function BottomTabs() {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Montserrat_700Bold,
+    Montserrat_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <JournalProvider>
       <NavigationContainer>
@@ -54,12 +80,20 @@ export default function App() {
           <Stack.Screen
             name="Main"
             component={BottomTabs}
-            options={{ headerShown: false }}
+            options={{
+              headerShown: false,
+            }}
           />
 
           <Stack.Screen
             name="Details"
             component={DetailsScreen}
+            options={{
+              title: "Trip Details",
+              headerTitleStyle: {
+                fontFamily: "Montserrat_700Bold",
+              },
+            }}
           />
         </Stack.Navigator>
       </NavigationContainer>

@@ -1,9 +1,16 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useState,
+} from "react";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const JournalContext = createContext();
 
-export const JournalProvider = ({ children }) => {
+export const JournalProvider = ({
+  children,
+}) => {
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
@@ -16,14 +23,15 @@ export const JournalProvider = ({ children }) => {
 
   const loadEntries = async () => {
     try {
-      const data = await AsyncStorage.getItem("journalEntries");
+      const saved =
+        await AsyncStorage.getItem(
+          "journalEntries"
+        );
 
-      if (data) {
-        setEntries(JSON.parse(data));
+      if (saved) {
+        setEntries(JSON.parse(saved));
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch {}
   };
 
   const saveEntries = async () => {
@@ -32,18 +40,21 @@ export const JournalProvider = ({ children }) => {
         "journalEntries",
         JSON.stringify(entries)
       );
-    } catch (error) {
-      console.log(error);
-    }
+    } catch {}
   };
 
   const addEntry = (entry) => {
-    setEntries((prev) => [...prev, entry]);
+    setEntries((prev) => [
+      entry,
+      ...prev,
+    ]);
   };
 
   const deleteEntry = (id) => {
     setEntries((prev) =>
-      prev.filter((item) => item.id !== id)
+      prev.filter(
+        (item) => item.id !== id
+      )
     );
   };
 

@@ -1,27 +1,35 @@
 import React, { useContext } from "react";
 import {
-  View,
-  Text,
   FlatList,
   TouchableOpacity,
   Image,
   StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { JournalContext } from "../context/JournalContext";
+
+const PLACEHOLDER =
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000";
 
 export default function ListScreen({ navigation }: any) {
   const { entries } = useContext(JournalContext);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        My List
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.heading}>
+        My Trips
       </Text>
 
       <FlatList
-        data={entries}
+        data={[...entries].sort(
+          (a, b) => Number(b.id) - Number(a.id)
+        )}
         keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
@@ -31,26 +39,40 @@ export default function ListScreen({ navigation }: any) {
               })
             }
           >
-            {item.image && (
-              <Image
-                source={{ uri: item.image }}
-                style={styles.image}
-              />
-            )}
+            <Image
+              source={{
+                uri: item.image || PLACEHOLDER,
+              }}
+              style={styles.image}
+            />
 
-            <View style={{ flex: 1 }}>
-              <Text style={styles.name}>
+            <View style={styles.info}>
+              <Text
+                style={styles.title}
+                numberOfLines={1}
+              >
                 {item.title}
               </Text>
 
-              <Text numberOfLines={2}>
-                {item.notes}
+              <Text style={styles.date}>
+                📅 {item.date || "No date"}
+              </Text>
+
+              <Text style={styles.location}>
+                📍 {item.location || "Unknown location"}
+              </Text>
+
+              <Text
+                numberOfLines={2}
+                style={styles.notes}
+              >
+                {item.notes || "No description"}
               </Text>
             </View>
           </TouchableOpacity>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -58,34 +80,59 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    padding: 20,
+    paddingHorizontal: 20,
   },
 
-  title: {
-    fontSize: 30,
-    fontWeight: "bold",
+  heading: {
+    fontSize: 32,
+    fontFamily: "Montserrat_700Bold",
+    marginTop: 10,
     marginBottom: 20,
   },
 
   card: {
     flexDirection: "row",
     backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 15,
-    marginBottom: 15,
-    alignItems: "center",
+    borderRadius: 20,
+    padding: 12,
+    marginBottom: 18,
+    elevation: 3,
   },
 
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    marginRight: 15,
+    width: 100,
+    height: 100,
+    borderRadius: 15,
   },
 
-  name: {
+  info: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: "center",
+  },
+
+  title: {
     fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 5,
+    fontFamily: "Montserrat_700Bold",
+    marginBottom: 4,
+  },
+
+  date: {
+    fontSize: 13,
+    color: "#888",
+    marginBottom: 4,
+    fontFamily: "Montserrat_400Regular",
+  },
+
+  location: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+    fontFamily: "Montserrat_400Regular",
+  },
+
+  notes: {
+    color: "#555",
+    fontFamily: "Montserrat_400Regular",
   },
 });

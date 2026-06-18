@@ -5,16 +5,16 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  Button,
+  TouchableOpacity,
   Alert,
 } from "react-native";
 
 import { JournalContext } from "../context/JournalContext";
 
-export default function DetailsScreen({
-  route,
-  navigation,
-}: any) {
+const PLACEHOLDER =
+  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000";
+
+export default function DetailsScreen({ route, navigation }: any) {
   const { entry } = route.params;
 
   const { deleteEntry } = useContext(JournalContext);
@@ -22,7 +22,7 @@ export default function DetailsScreen({
   const handleDelete = () => {
     Alert.alert(
       "Delete Entry",
-      "Are you sure you want to delete this journal entry?",
+      "Are you sure you want to delete this travel journal?",
       [
         {
           text: "Cancel",
@@ -42,39 +42,56 @@ export default function DetailsScreen({
 
   return (
     <ScrollView style={styles.container}>
-      {entry.image ? (
-        <Image
-          source={{ uri: entry.image }}
-          style={styles.image}
-        />
-      ) : null}
+      <Image
+        source={{
+          uri: entry.image || PLACEHOLDER,
+        }}
+        style={styles.image}
+      />
 
       <View style={styles.content}>
         <Text style={styles.title}>
           {entry.title}
         </Text>
 
-        {entry.location ? (
-          <Text style={styles.location}>
-            📍 {entry.location}
+        <View style={styles.infoBox}>
+          <Text style={styles.label}>
+            📅 Travel Date
           </Text>
-        ) : null}
 
-        <Text style={styles.section}>
-          Notes
-        </Text>
-
-        <Text style={styles.notes}>
-          {entry.notes || "No notes available."}
-        </Text>
-
-        <View style={{ marginTop: 30 }}>
-          <Button
-            title="Delete Entry"
-            color="red"
-            onPress={handleDelete}
-          />
+          <Text style={styles.value}>
+            {entry.date || "Not specified"}
+          </Text>
         </View>
+
+        <View style={styles.infoBox}>
+          <Text style={styles.label}>
+            📍 Location
+          </Text>
+
+          <Text style={styles.value}>
+            {entry.location || "Unknown"}
+          </Text>
+        </View>
+
+        <View style={styles.infoBox}>
+          <Text style={styles.label}>
+            📝 Notes
+          </Text>
+
+          <Text style={styles.notes}>
+            {entry.notes || "No notes added."}
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={handleDelete}
+        >
+          <Text style={styles.deleteText}>
+            Delete Entry
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -83,12 +100,12 @@ export default function DetailsScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
   },
 
   image: {
     width: "100%",
-    height: 300,
+    height: 280,
   },
 
   content: {
@@ -96,26 +113,49 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginBottom: 10,
+    fontSize: 32,
+    fontFamily: "Montserrat_700Bold",
+    marginBottom: 25,
   },
 
-  location: {
-    fontSize: 18,
+  infoBox: {
+    backgroundColor: "white",
+    padding: 18,
+    borderRadius: 18,
+    marginBottom: 18,
+    elevation: 3,
+  },
+
+  label: {
+    fontSize: 15,
     color: "#666",
-    marginBottom: 20,
+    marginBottom: 6,
+    fontFamily: "Montserrat_400Regular",
   },
 
-  section: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 10,
+  value: {
+    fontSize: 19,
+    fontFamily: "Montserrat_700Bold",
   },
 
   notes: {
+    fontSize: 17,
+    lineHeight: 26,
+    fontFamily: "Montserrat_400Regular",
+  },
+
+  deleteButton: {
+    backgroundColor: "#e53935",
+    padding: 18,
+    borderRadius: 18,
+    alignItems: "center",
+    marginTop: 15,
+    marginBottom: 30,
+  },
+
+  deleteText: {
+    color: "white",
     fontSize: 18,
-    lineHeight: 28,
-    color: "#444",
+    fontFamily: "Montserrat_700Bold",
   },
 });
