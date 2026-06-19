@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   FlatList,
   TouchableOpacity,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   View,
+  TextInput,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,19 +19,39 @@ const PLACEHOLDER =
 export default function ListScreen({ navigation }: any) {
   const { entries } = useContext(JournalContext);
 
+  const [search, setSearch] = useState("");
+
+  const filteredEntries = entries.filter(
+    (entry: any) =>
+      entry.title
+        ?.toLowerCase()
+        .includes(search.toLowerCase()) ||
+      entry.location
+        ?.toLowerCase()
+        .includes(search.toLowerCase())
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.heading}>
         My Trips
       </Text>
 
+      <TextInput
+        placeholder="🔍 Search trips..."
+        value={search}
+        onChangeText={setSearch}
+        style={styles.search}
+      />
+
       <FlatList
-        data={[...entries].sort(
-          (a, b) => Number(b.id) - Number(a.id)
+        data={[...filteredEntries].sort(
+          (a: any, b: any) =>
+            Number(b.id) - Number(a.id)
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: any) => item.id}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
+        renderItem={({ item }: any) => (
           <TouchableOpacity
             style={styles.card}
             onPress={() =>
@@ -87,7 +108,15 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontFamily: "Montserrat_700Bold",
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 15,
+  },
+
+  search: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 15,
+    fontFamily: "Montserrat_400Regular",
   },
 
   card: {

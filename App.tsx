@@ -18,6 +18,7 @@ import ListScreen from "./src/screens/ListScreen";
 import AddEntryScreen from "./src/screens/AddEntryScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import DetailsScreen from "./src/screens/DetailsScreen";
+import EditEntryScreen from "./src/screens/EditEntryScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -95,6 +96,13 @@ export default function App() {
               },
             }}
           />
+          <Stack.Screen
+  name="EditEntry"
+  component={EditEntryScreen}
+  options={{
+    title: "Edit Trip",
+  }}
+/>
         </Stack.Navigator>
       </NavigationContainer>
     </JournalProvider>

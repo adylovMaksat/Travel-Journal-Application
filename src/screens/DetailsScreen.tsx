@@ -14,10 +14,14 @@ import { JournalContext } from "../context/JournalContext";
 const PLACEHOLDER =
   "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000";
 
-export default function DetailsScreen({ route, navigation }: any) {
+export default function DetailsScreen({
+  route,
+  navigation,
+}: any) {
   const { entry } = route.params;
 
-  const { deleteEntry } = useContext(JournalContext);
+  const { deleteEntry } =
+    useContext(JournalContext);
 
   const handleDelete = () => {
     Alert.alert(
@@ -41,19 +45,28 @@ export default function DetailsScreen({ route, navigation }: any) {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Image
-        source={{
-          uri: entry.image || PLACEHOLDER,
-        }}
-        style={styles.image}
-      />
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.imageContainer}>
+        <Image
+          source={{
+            uri: entry.image || PLACEHOLDER,
+          }}
+          style={styles.image}
+        />
+
+        <View style={styles.overlay} />
+
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>
+            {entry.title}
+          </Text>
+        </View>
+      </View>
 
       <View style={styles.content}>
-        <Text style={styles.title}>
-          {entry.title}
-        </Text>
-
         <View style={styles.infoBox}>
           <Text style={styles.label}>
             📅 Travel Date
@@ -85,6 +98,22 @@ export default function DetailsScreen({ route, navigation }: any) {
         </View>
 
         <TouchableOpacity
+          style={styles.editButton}
+          onPress={() =>
+            navigation.navigate(
+              "EditEntry",
+              {
+                entry,
+              }
+            )
+          }
+        >
+          <Text style={styles.editText}>
+            Edit Entry
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={styles.deleteButton}
           onPress={handleDelete}
         >
@@ -103,54 +132,93 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
 
-  image: {
-    width: "100%",
-    height: 280,
+  imageContainer: {
+    position: "relative",
   },
 
-  content: {
-    padding: 20,
+  image: {
+    width: "100%",
+    height: 340,
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+  },
+
+  overlay: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    height: 140,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    borderBottomLeftRadius: 35,
+    borderBottomRightRadius: 35,
+  },
+
+  titleContainer: {
+    position: "absolute",
+    bottom: 30,
+    left: 20,
+    right: 20,
   },
 
   title: {
-    fontSize: 32,
+    color: "white",
+    fontSize: 34,
     fontFamily: "Montserrat_700Bold",
-    marginBottom: 25,
+  },
+
+  content: {
+    marginTop: -20,
+    padding: 20,
   },
 
   infoBox: {
     backgroundColor: "white",
-    padding: 18,
-    borderRadius: 18,
+    padding: 20,
+    borderRadius: 22,
     marginBottom: 18,
-    elevation: 3,
+    elevation: 4,
   },
 
   label: {
-    fontSize: 15,
-    color: "#666",
-    marginBottom: 6,
+    color: "#777",
+    marginBottom: 8,
+    fontSize: 14,
     fontFamily: "Montserrat_400Regular",
   },
 
   value: {
-    fontSize: 19,
+    fontSize: 20,
     fontFamily: "Montserrat_700Bold",
   },
 
   notes: {
     fontSize: 17,
-    lineHeight: 26,
+    lineHeight: 28,
+    color: "#444",
     fontFamily: "Montserrat_400Regular",
+  },
+
+  editButton: {
+    backgroundColor: "#2563eb",
+    padding: 18,
+    borderRadius: 20,
+    alignItems: "center",
+    marginTop: 10,
+  },
+
+  editText: {
+    color: "white",
+    fontSize: 18,
+    fontFamily: "Montserrat_700Bold",
   },
 
   deleteButton: {
     backgroundColor: "#e53935",
     padding: 18,
-    borderRadius: 18,
+    borderRadius: 20,
     alignItems: "center",
     marginTop: 15,
-    marginBottom: 30,
+    marginBottom: 40,
   },
 
   deleteText: {

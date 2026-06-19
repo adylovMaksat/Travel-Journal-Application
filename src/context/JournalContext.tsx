@@ -50,6 +50,16 @@ export const JournalProvider = ({
     ]);
   };
 
+  const updateEntry = (updatedEntry) => {
+    setEntries((prev) =>
+      prev.map((item) =>
+        item.id === updatedEntry.id
+          ? updatedEntry
+          : item
+      )
+    );
+  };
+
   const deleteEntry = (id) => {
     setEntries((prev) =>
       prev.filter(
@@ -63,6 +73,7 @@ export const JournalProvider = ({
       value={{
         entries,
         addEntry,
+        updateEntry,
         deleteEntry,
       }}
     >
