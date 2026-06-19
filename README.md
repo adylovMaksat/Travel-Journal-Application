@@ -7,8 +7,8 @@ Built with React Native and Expo.
 ---
 ## Developers
 
-- Maksatbek Adylov 1
-- Omurbek Uraimov 2
+- 1. Maksatbek Adylov - 56422
+- 2. Omurbek Uraimov - 54167
 
 Course Project – Mobile Application Development
 
